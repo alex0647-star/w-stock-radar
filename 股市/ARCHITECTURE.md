@@ -90,6 +90,8 @@ CREATE TABLE recommendations (
 ```text
 GET    /api/stocks
 GET    /api/stocks/:code
+GET    /api/stock/:code/realtime
+GET    /api/stock/:code/kline?type=daily
 GET    /api/recommendations
 POST   /api/watchlist
 DELETE /api/watchlist/:stockId
@@ -120,6 +122,17 @@ body：
 - MVP：前端 Polling，每 60 秒打 `/api/stocks`。
 - 交易時段：可縮短為 15 秒。
 - 正式版：後端定時抓取第三方報價後寫入 Redis cache，再用 WebSocket 或 SSE 推送給前端。
+
+### 詳情頁行情 API
+
+目前已新增：
+
+- `GET /api/stock/:code/realtime`：回傳當日分時成交價、成交量，以及最新價、漲跌價、漲跌幅、開高低與成交量。
+- `GET /api/stock/:code/kline?type=daily|weekly|monthly`：回傳歷史 K 線 OHLCV，前端用於日K、週K、月K。
+
+前端路由：
+
+- `/stock/2330` 會透過 Vercel rewrite 導到 `stock.html`，再由前端解析 pathname 取得股票代號。
 
 ## 階段四：AI 推薦原因與策略生成
 
