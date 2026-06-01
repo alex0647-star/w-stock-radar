@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/twse.js": {
+      "maxDuration": 10
+    }
+  }
+}
