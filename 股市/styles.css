@@ -457,7 +457,17 @@ canvas {
   border-radius: 8px;
   background: var(--panel);
   box-shadow: 0 12px 28px rgba(38, 32, 24, 0.08);
-  padding: 18px;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1),
+              border-color 0.22s ease,
+              box-shadow 0.22s ease;
+}
+
+.stock-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent, var(--teal));
+  box-shadow: 0 16px 36px rgba(38, 32, 24, 0.12);
 }
 
 .stock-card::before {
@@ -557,6 +567,77 @@ canvas {
   color: var(--muted);
   font-size: 14px;
   line-height: 1.6;
+}
+
+.analysis-block,
+.strategy-block {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.analysis-block h4,
+.strategy-block h4 {
+  margin: 0 0 9px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.analysis-block ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.strategy-block {
+  border-color: rgba(183, 121, 31, 0.34);
+  background: #fffaf0;
+}
+
+.strategy-block p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.strategy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.strategy-grid div {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(183, 121, 31, 0.22);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.strategy-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.strategy-grid strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.strategy-note {
+  color: #7a4a08 !important;
 }
 
 .session-row {
@@ -729,7 +810,8 @@ canvas {
   .market-stats,
   .recommendations,
   .metrics,
-  .quote-strip {
+  .quote-strip,
+  .strategy-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1145,5 +1227,189 @@ canvas {
     border-top: 1px solid var(--line);
     padding-top: 20px;
   }
+  .modal-market-dashboard {
+    grid-template-columns: 1fr;
+  }
 }
 
+/* ==========================================================================
+   新增行情、交易量與卡片段落優化 (Card Layout & Market Details Additions)
+   ========================================================================== */
+
+.card-price-strip {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.card-price-strip .price-val {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.card-price-strip .change-val {
+  font-size: 13.5px;
+  font-weight: 800;
+}
+
+.card-insight-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.card-insight-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-insight-label {
+  font-size: 12.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-insight-label.reason-label {
+  color: var(--accent, var(--teal));
+}
+
+.card-insight-label.strategy-label {
+  color: var(--amber);
+}
+
+.card-insight-body {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+}
+
+.card-click-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: color 0.16s ease;
+}
+
+.stock-card:hover .card-click-hint {
+  color: var(--accent, var(--teal));
+}
+
+/* Modal Market Dashboard & Volume Gauges */
+.modal-market-dashboard {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.1fr;
+  gap: 16px;
+  margin-bottom: 8px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--line);
+}
+
+.market-dashboard-card {
+  background: rgba(246, 244, 238, 0.5);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.market-dashboard-card.price-card {
+  background: #fff;
+  border-color: var(--line);
+  box-shadow: 0 4px 14px rgba(24, 32, 38, 0.04);
+}
+
+.market-dashboard-card span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.market-dashboard-card .quote-main {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.market-dashboard-card .quote-price {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.market-dashboard-card .quote-change {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.volume-gauge-wrapper {
+  margin-top: 6px;
+}
+
+.volume-gauge-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.volume-gauge-bar-outer {
+  height: 6px;
+  background: rgba(222, 216, 204, 0.6);
+  border-radius: 99px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.volume-gauge-bar-inner {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--teal);
+  width: 0%;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.session-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  margin-top: 4px;
+}
+
+.session-metric-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(222, 216, 204, 0.4);
+  padding-bottom: 4px;
+}
+
+.session-metric-item label {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.session-metric-item val {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--ink);
+}

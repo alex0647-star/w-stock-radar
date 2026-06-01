@@ -1,26 +1,206 @@
 const stocks = [
-  ["2330", "台積電", "半導體", "growth", 95, 1.7, 92, 32, 24.8, "#2563eb", "AI 晶片、高效能運算與先進製程需求仍是核心動能，長線競爭力明確，但評價已反映高成長期待。"],
-  ["2454", "聯發科", "IC 設計", "growth", 90, 4.1, 78, 42, 18.6, "#0891b2", "手機、Wi-Fi、車用與邊緣 AI 題材提供成長想像，現金配息也具吸引力，適合成長收益並重觀察。"],
-  ["2308", "台達電", "電源與散熱", "growth", 88, 1.9, 82, 37, 26.4, "#16a34a", "資料中心電源、散熱、電動車與工業自動化都是中長期題材，營運品質佳，適合拉回分批追蹤。"],
-  ["2317", "鴻海", "電子代工", "value", 86, 3.0, 85, 45, 14.8, "#7c3aed", "AI 伺服器、電動車與代工規模優勢帶來重新評價機會，股價波動較大，需留意追價風險。"],
-  ["2382", "廣達", "AI 伺服器", "growth", 85, 3.6, 87, 56, 20.2, "#dc2626", "AI 伺服器出貨能見度高，動能強但籌碼與題材敏感度也高，適合設好停損與分批策略。"],
-  ["2881", "富邦金", "金融", "income", 83, 5.2, 60, 30, 12.7, "#ca8a04", "壽險與銀行獲利修復時具配息想像，適合收益型投資人觀察，但仍需留意利率與匯率變化。"],
-  ["2891", "中信金", "金融", "income", 82, 4.8, 58, 28, 11.9, "#b45309", "銀行本業穩健、配息期待較清楚，價格彈性通常低於電子股，適合作為觀察組合的穩定部位。"],
-  ["2412", "中華電", "電信", "income", 79, 3.7, 43, 20, 24.1, "#0f766e", "現金流與配息穩定，波動較低，適合防禦配置；短線爆發力有限，較適合作為核心觀察股。"],
-  ["2357", "華碩", "品牌電腦", "value", 78, 4.4, 54, 40, 14.1, "#4d7c0f", "PC 景氣循環回溫與 AI PC 題材提供支撐，評價相對溫和，適合用殖利率與景氣循環角度觀察。"],
-  ["2884", "玉山金", "金融", "income", 76, 4.2, 48, 27, 13.4, "#059669", "資產品質與獲利穩定度佳，適合偏保守的金融股觀察名單；成長速度通常不如高 beta 電子股。"]
-].map(([code, name, sector, style, score, yieldRate, momentum, risk, pe, accent, reason]) => ({
-  code,
-  name,
-  sector,
-  style,
-  score,
-  yield: yieldRate,
-  momentum,
-  risk,
-  pe,
-  accent,
-  reason,
+  {
+    code: "2330",
+    name: "台積電",
+    sector: "半導體",
+    style: "growth",
+    score: 95,
+    yield: 0.9,
+    momentum: 92,
+    risk: 32,
+    pe: 24.8,
+    accent: "#2563eb",
+    reason: ["AI 晶片與高效能運算需求延續，先進製程仍具全球定價能力。", "資本支出與客戶訂單能見度高，長線競爭優勢明確。", "大型權值股流動性佳，適合作為科技成長核心觀察股。"],
+    strategy: {
+      summary: "偏長線成長配置，避免急漲後追高，適合分批建立基本部位。",
+      entry: "回測 10 日或月線附近分批",
+      takeProfit: "上漲 12% 至 18% 分批停利",
+      stopLoss: "跌破月線且量能轉弱",
+      note: "若大盤系統性修正，可保留資金分 2 至 3 次加碼。"
+    }
+  },
+  {
+    code: "2454",
+    name: "聯發科",
+    sector: "IC 設計",
+    style: "growth",
+    score: 90,
+    yield: 4.1,
+    momentum: 78,
+    risk: 42,
+    pe: 18.6,
+    accent: "#0891b2",
+    reason: ["手機、Wi-Fi、車用與邊緣 AI 題材提供成長動能。", "現金流與配息水準具吸引力，兼具成長與收益特性。", "評價相對台股高成長電子股仍有觀察空間。"],
+    strategy: {
+      summary: "適合成長收益並重，等待拉回或盤整突破再分批。",
+      entry: "回落至季線附近或突破整理區",
+      takeProfit: "前高附近先收回部分本金",
+      stopLoss: "跌破季線後 2 至 3 日無法站回",
+      note: "若殖利率維持 4% 以上，可提高長線持有比重。"
+    }
+  },
+  {
+    code: "2308",
+    name: "台達電",
+    sector: "電源與散熱",
+    style: "growth",
+    score: 88,
+    yield: 1.9,
+    momentum: 82,
+    risk: 37,
+    pe: 26.4,
+    accent: "#16a34a",
+    reason: ["資料中心電源、散熱、電動車與工業自動化皆有中長期需求。", "營運品質穩健，產品線分散度高。", "股價拉回時通常具機構資金承接力。"],
+    strategy: {
+      summary: "中長線偏多觀察，適合用支撐位置分批承接。",
+      entry: "回測月線或前波平台支撐",
+      takeProfit: "創高後漲勢鈍化分批調節",
+      stopLoss: "跌破前波低點",
+      note: "偏高評價時不宜一次買滿，保留加碼彈性。"
+    }
+  },
+  {
+    code: "2317",
+    name: "鴻海",
+    sector: "電子代工",
+    style: "value",
+    score: 86,
+    yield: 3.0,
+    momentum: 85,
+    risk: 45,
+    pe: 14.8,
+    accent: "#7c3aed",
+    reason: ["AI 伺服器與電動車題材帶來重新評價機會。", "代工規模優勢與供應鏈整合能力仍具競爭力。", "本益比相對溫和，若獲利改善有評價修復空間。"],
+    strategy: {
+      summary: "偏價值轉型股，適合等待量價轉強後分批。",
+      entry: "突破整理區後回測不破",
+      takeProfit: "評價修復或題材過熱時分批",
+      stopLoss: "跌破整理區下緣",
+      note: "題材股波動較大，建議控制單一持股比例。"
+    }
+  },
+  {
+    code: "2382",
+    name: "廣達",
+    sector: "AI 伺服器",
+    style: "growth",
+    score: 85,
+    yield: 3.6,
+    momentum: 87,
+    risk: 56,
+    pe: 20.2,
+    accent: "#dc2626",
+    reason: ["AI 伺服器出貨能見度高，營收題材明確。", "動能強，容易吸引短中線資金。", "波動度偏高，需搭配嚴格風險控管。"],
+    strategy: {
+      summary: "適合波段交易，不建議在急漲長紅後追價。",
+      entry: "回測 10 日線或量縮整理時",
+      takeProfit: "上漲 10% 至 15% 分批落袋",
+      stopLoss: "跌破 20 日線或爆量長黑",
+      note: "若持有成本偏高，應用移動停利保護獲利。"
+    }
+  },
+  {
+    code: "2881",
+    name: "富邦金",
+    sector: "金融",
+    style: "income",
+    score: 83,
+    yield: 5.2,
+    momentum: 60,
+    risk: 30,
+    pe: 12.7,
+    accent: "#ca8a04",
+    reason: ["壽險與銀行獲利修復時，配息想像較明確。", "金融股波動相對電子股低，可平衡組合風險。", "殖利率具吸引力，適合收益型投資人觀察。"],
+    strategy: {
+      summary: "偏存股與收益配置，適合逢回分批，不追短線急漲。",
+      entry: "除息後回穩或殖利率高於 5%",
+      takeProfit: "漲至低殖利率區間可調節",
+      stopLoss: "金融環境惡化且跌破年線",
+      note: "以股利與穩定性為主，短線價差不是核心目標。"
+    }
+  },
+  {
+    code: "2891",
+    name: "中信金",
+    sector: "金融",
+    style: "income",
+    score: 82,
+    yield: 4.8,
+    momentum: 58,
+    risk: 28,
+    pe: 11.9,
+    accent: "#b45309",
+    reason: ["銀行本業穩健，獲利與配息預期較清楚。", "股價彈性低於電子股，但防禦性較佳。", "適合作為觀察組合的穩定收益部位。"],
+    strategy: {
+      summary: "核心收益型持股，適合定期分批累積。",
+      entry: "殖利率接近 5% 或回測季線",
+      takeProfit: "短線急漲偏離均線時調節",
+      stopLoss: "跌破年線且獲利展望下修",
+      note: "可用定期定額降低金融股循環波動。"
+    }
+  },
+  {
+    code: "2412",
+    name: "中華電",
+    sector: "電信",
+    style: "income",
+    score: 79,
+    yield: 3.7,
+    momentum: 43,
+    risk: 20,
+    pe: 24.1,
+    accent: "#0f766e",
+    reason: ["現金流與配息穩定，波動度低。", "電信龍頭具防禦屬性，可降低投資組合波動。", "短線爆發力有限，較適合長期核心配置。"],
+    strategy: {
+      summary: "防禦型存股，重點是穩定配息與低波動。",
+      entry: "回測年線或殖利率改善時",
+      takeProfit: "大幅偏離歷史評價時調節",
+      stopLoss: "基本面明顯轉弱才檢討",
+      note: "適合以長期持有和股利再投入為主。"
+    }
+  },
+  {
+    code: "2357",
+    name: "華碩",
+    sector: "品牌電腦",
+    style: "value",
+    score: 78,
+    yield: 4.4,
+    momentum: 54,
+    risk: 40,
+    pe: 14.1,
+    accent: "#4d7c0f",
+    reason: ["PC 景氣循環回溫與 AI PC 題材提供支撐。", "評價相對溫和，殖利率具吸引力。", "適合用景氣循環與股利角度追蹤。"],
+    strategy: {
+      summary: "景氣循環價值股，適合在低評價區分批。",
+      entry: "本益比偏低且股價回測支撐",
+      takeProfit: "PC 題材升溫或評價修復時",
+      stopLoss: "營收連續轉弱且跌破前低",
+      note: "觀察庫存與毛利率是否同步改善。"
+    }
+  },
+  {
+    code: "2884",
+    name: "玉山金",
+    sector: "金融",
+    style: "income",
+    score: 76,
+    yield: 4.2,
+    momentum: 48,
+    risk: 27,
+    pe: 13.4,
+    accent: "#059669",
+    reason: ["資產品質與獲利穩定度佳。", "股價波動低，適合保守型金融股觀察。", "配息雖非最高，但長期穩定性具優勢。"],
+    strategy: {
+      summary: "保守收益配置，適合慢慢累積，不適合追求短線爆發。",
+      entry: "回測季線或殖利率高於 4%",
+      takeProfit: "高於歷史評價區間時調節",
+      stopLoss: "獲利下修且跌破年線",
+      note: "可和高成長電子股搭配，降低組合波動。"
+    }
+  }
+].map((stock) => ({
+  ...stock,
   price: 0,
   previousClose: 0,
   open: 0,
@@ -110,6 +290,10 @@ function formatSigned(value, suffix = "") {
   return `${sign}${value.toFixed(2)}${suffix}`;
 }
 
+function formatVolume(value) {
+  return value ? `${Math.round(value / 1000).toLocaleString("zh-TW")} 張` : "--";
+}
+
 function setDataStatus(message, tone = "muted") {
   if (!els.dataStatus) return;
   els.dataStatus.textContent = message;
@@ -133,7 +317,7 @@ async function getJson(type) {
 
 function currentStocks() {
   if (page === "favorites") {
-    return stocks.filter((stock) => state.watch.has(stock.code));
+    return stocks.filter((stock) => state.watch.has(stock.code)).sort(sortStocks);
   }
 
   const query = state.query.trim().toLowerCase();
@@ -157,6 +341,12 @@ function sortStocks(a, b) {
   if (state.sort === "risk") return a.risk - b.risk;
   if (state.sort === "changePercent") return b.changePercent - a.changePercent;
   return b.score - a.score;
+}
+
+function styleLabel(style) {
+  if (style === "growth") return "成長";
+  if (style === "value") return "價值";
+  return "收益";
 }
 
 function riskLabel(risk) {
@@ -184,13 +374,14 @@ function renderStockCard(stock) {
   const added = state.watch.has(stock.code);
   const changeClass = stock.change > 0 ? "up" : stock.change < 0 ? "down" : "flat";
   const buttonText = page === "favorites" ? "移出最愛" : added ? "已加入最愛" : "加入最愛";
+  const reasonItems = stock.reason.map((item) => `<li>${item}</li>`).join("");
 
   return `
     <article class="stock-card" style="--accent:${stock.accent}">
       <div class="stock-head">
         <div class="stock-title">
           <h3>${stock.code} ${stock.name}</h3>
-          <span class="stock-meta">${stock.sector}</span>
+          <span class="stock-meta">${stock.sector} / ${styleLabel(stock.style)}</span>
         </div>
         <div class="score-badge" title="推薦分數">${stock.score}</div>
       </div>
@@ -204,10 +395,24 @@ function renderStockCard(stock) {
       <div class="metrics">
         <div class="metric"><span>殖利率</span><strong>${stock.yield.toFixed(1)}%</strong></div>
         <div class="metric"><span>本益比</span><strong>${stock.pe ? stock.pe.toFixed(1) : "--"}</strong></div>
-        <div class="metric"><span>成交量</span><strong>${stock.volume ? Math.round(stock.volume / 1000).toLocaleString("zh-TW") + " 張" : "--"}</strong></div>
+        <div class="metric"><span>成交量</span><strong>${formatVolume(stock.volume)}</strong></div>
       </div>
 
-      <p class="reason">${stock.reason}</p>
+      <section class="analysis-block">
+        <h4>推薦原因</h4>
+        <ul>${reasonItems}</ul>
+      </section>
+
+      <section class="strategy-block">
+        <h4>建議策略</h4>
+        <p>${stock.strategy.summary}</p>
+        <div class="strategy-grid">
+          <div><span>進場區間</span><strong>${stock.strategy.entry}</strong></div>
+          <div><span>停利目標</span><strong>${stock.strategy.takeProfit}</strong></div>
+          <div><span>停損防守</span><strong>${stock.strategy.stopLoss}</strong></div>
+        </div>
+        <p class="strategy-note">${stock.strategy.note}</p>
+      </section>
 
       <div class="session-row">
         <span>開 ${formatPrice(stock.open)}</span>
@@ -217,10 +422,7 @@ function renderStockCard(stock) {
 
       <div class="card-actions">
         <span class="risk-pill" style="--risk-color:${risk.color}">${risk.text} ${stock.risk}</span>
-        <div class="card-buttons">
-          <button class="analyze-btn" data-analyze="${stock.code}" type="button">分析策略</button>
-          <button class="watch-btn ${added ? "added" : ""}" data-code="${stock.code}" type="button">${buttonText}</button>
-        </div>
+        <button class="watch-btn ${added ? "added" : ""}" data-code="${stock.code}" type="button">${buttonText}</button>
       </div>
     </article>
   `;
@@ -425,7 +627,7 @@ async function refreshMarketData() {
     try {
       applyRealtime(await getJson("realtime"));
     } catch {
-      // Daily data remains available when realtime MIS is blocked.
+      // Daily OpenAPI data is still useful when realtime MIS is unavailable.
     }
 
     setDataStatus(`已更新：${new Date().toLocaleString("zh-TW", { hour12: false })}`, "ok");
@@ -474,9 +676,6 @@ function bindEvents() {
   document.addEventListener("click", (event) => {
     const watchButton = event.target.closest("[data-code]");
     const removeButton = event.target.closest("[data-remove]");
-    const analyzeButton = event.target.closest("[data-analyze]");
-    const closeBtn = event.target.closest("#closeModalBtn");
-    const overlay = event.target;
 
     if (watchButton) {
       const code = watchButton.dataset.code;
@@ -491,375 +690,12 @@ function bindEvents() {
       saveWatchList();
       render();
     }
-
-    if (analyzeButton) {
-      openAnalysisModal(analyzeButton.dataset.analyze);
-    }
-
-    if (closeBtn || (overlay && overlay.id === "analysisModal")) {
-      closeAnalysisModal();
-    }
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeAnalysisModal();
-    }
   });
 
   window.addEventListener("resize", render);
-}
-
-/* ==========================================================================
-   個股策略與分析邏輯 (Modal & Strategy Analysis Implementation)
-   ========================================================================== */
-
-let currentAnalysisStock = null;
-
-function openAnalysisModal(stockCode) {
-  const stock = stocks.find((s) => s.code === stockCode);
-  if (!stock) return;
-
-  currentAnalysisStock = stock;
-  const modal = document.querySelector("#analysisModal");
-  const modalBody = document.querySelector("#modalBody");
-
-  if (!modal || !modalBody) return;
-
-  // 初始試算參數設定
-  const defaultAmount = 100000;
-  const defaultPeriod = "long";
-
-  // 渲染初始版面樣式
-  modalBody.innerHTML = generateAnalysisHtml(stock, defaultAmount, defaultPeriod);
-
-  // 延遲載入進度條動畫以利瀏覽器渲染過渡
-  setTimeout(() => {
-    const bars = modalBody.querySelectorAll(".indicator-progress-inner");
-    bars.forEach((bar) => {
-      const val = bar.dataset.val;
-      bar.style.width = `${val}%`;
-    });
-  }, 40);
-
-  // 開啟視窗
-  modal.classList.add("active");
-  modal.setAttribute("aria-hidden", "false");
-
-  // 綁定智慧試算事件
-  const amountInput = modalBody.querySelector("#investmentAmount");
-  const periodSelect = modalBody.querySelector("#investmentPeriod");
-
-  const updateCalc = () => {
-    const amount = toNumber(amountInput.value) || 0;
-    const period = periodSelect.value;
-    const results = calculateStockStrategy(stock, amount, period);
-
-    const sharesEl = modalBody.querySelector("#calcShares");
-    const dividendEl = modalBody.querySelector("#calcDividend");
-    const strategyEl = modalBody.querySelector("#strategyAdvice");
-
-    if (sharesEl) sharesEl.innerHTML = results.sharesText;
-    if (dividendEl) dividendEl.textContent = results.dividendText;
-    if (strategyEl) {
-      strategyEl.querySelector("h5").textContent = results.strategyTitle;
-      strategyEl.querySelector("p").textContent = results.strategyBody;
-    }
-  };
-
-  amountInput?.addEventListener("input", updateCalc);
-  periodSelect?.addEventListener("change", updateCalc);
-}
-
-function closeAnalysisModal() {
-  const modal = document.querySelector("#analysisModal");
-  if (!modal) return;
-  modal.classList.remove("active");
-  modal.setAttribute("aria-hidden", "true");
-  currentAnalysisStock = null;
-}
-
-function calculateStockStrategy(stock, amount, period) {
-  const price = stock.price || 0;
-  const yieldVal = stock.yield || 0;
-
-  // 1. 預估可買進股數計算
-  let sharesText = "--";
-  if (price > 0) {
-    const shares = Math.floor(amount / price);
-    if (shares >= 1000) {
-      const lots = Math.floor(shares / 1000);
-      const remain = shares % 1000;
-      sharesText = `<span class="highlight">${shares.toLocaleString("zh-TW")}</span> 股 <small>(${lots} 張${remain ? ` + ${remain} 股` : ""})</small>`;
-    } else if (shares > 0) {
-      sharesText = `<span class="highlight">${shares}</span> 股 <small>(零股交易)</small>`;
-    } else {
-      sharesText = `<span class="highlight">0</span> 股 <small>(資金不足買 1 股)</small>`;
-    }
-  } else {
-    sharesText = `<span style="color:var(--red)">請立即更新報價</span>`;
-  }
-
-  // 2. 年估計股利回報
-  const estDividend = Math.round(amount * (yieldVal / 100));
-  const dividendText = price > 0 ? `NT$ ${estDividend.toLocaleString("zh-TW")} 元 / 年` : "--";
-
-  // 3. 建議買點、停利目標與停損價位
-  let buyLevel = "--";
-  let profitLevel = "--";
-  let stopLevel = "--";
-
-  if (price > 0) {
-    if (stock.style === "growth") {
-      buyLevel = formatPrice(price * 0.96);
-      profitLevel = formatPrice(price * 1.15);
-      stopLevel = formatPrice(price * 0.91);
-    } else if (stock.style === "value") {
-      buyLevel = formatPrice(price * 0.95);
-      profitLevel = formatPrice(price * 1.18);
-      stopLevel = formatPrice(price * 0.90);
-    } else { // income
-      buyLevel = formatPrice(price * 0.98);
-      profitLevel = formatPrice(price * 1.08);
-      stopLevel = formatPrice(price * 0.95);
-    }
-  }
-
-  // 4. 客製化交易策略內容
-  let strategyTitle = "";
-  let strategyBody = "";
-
-  if (period === "swing") {
-    strategyTitle = "📊 波段操作建議策略";
-    if (stock.style === "growth") {
-      strategyBody = `建議設定 10 日均線（約 ${buyLevel} 元）附近為分批波段切入點。若股價跌破月線或支撐關卡（約 ${stopLevel} 元）則應嚴格停損。第一階段停利目標設為 ${profitLevel} 元，預估有 15% 上檔空間。`;
-    } else if (stock.style === "value") {
-      strategyBody = `本益比偏低具備高度安全邊際。適合在股價回檔至區間下緣（約 ${buyLevel} 元）分批承接。一旦轉型或伺服器題材發酵帶動評價修復、股價向停利點 ${profitLevel} 元靠攏時即可分批獲利了結。`;
-    } else {
-      strategyBody = `收益型標的波動度極低，短線波段空間偏窄。若逢盤勢修正使股價跌至 ${buyLevel} 元可酌量介入，反彈至停利目標 ${profitLevel} 元即可獲利入袋，操作不宜過度追價。`;
-    }
-  } else {
-    strategyTitle = "📈 長期投資配置策略";
-    if (stock.style === "growth") {
-      strategyBody = `長線高成長領先股，極適合以『定期定額』建立基本部位。若遇大盤系統性修正導致股價跌幅達 10-15%（跌破 ${stopLevel} 元）時，建議採單筆額外加碼。策略以中長線持有為主，充分享受行業長期增值的複利效應。`;
-    } else if (stock.style === "value") {
-      strategyBody = `適合在中長線景氣循環底部或轉型期逢低分批布局。建議設定 1 年以上的持有耐心，在股價低於 ${buyLevel} 元時逐步累積部位，靜待營運體質优化與盈餘重新評價的到來。`;
-    } else {
-      strategyBody = `核心存股標的。建議採取『逢黑 K 買進』策略以降低平均持有成本。當股價低於 ${buyLevel} 元時是極佳的加碼扣款點，並建議將每年領取的現金股利持續『複利再投資』，發揮長線滾雪球的最大綜效。`;
-    }
-  }
-
-  return {
-    sharesText,
-    dividendText,
-    buyLevel,
-    profitLevel,
-    stopLevel,
-    strategyTitle,
-    strategyBody
-  };
-}
-
-function generateAnalysisHtml(stock, amount, period) {
-  // 根據投資類型計算指標雷達圖佔比 (成長潛力、防禦屬性、收益回報、市場動能)
-  let growthRating = 50;
-  let defenseRating = 50;
-  let yieldRating = 50;
-  let momentumRating = Math.round(stock.momentum);
-
-  if (stock.style === "growth") {
-    growthRating = 94;
-    defenseRating = 55;
-    yieldRating = 42;
-  } else if (stock.style === "value") {
-    growthRating = 74;
-    defenseRating = 72;
-    yieldRating = 60;
-  } else if (stock.style === "income") {
-    growthRating = 40;
-    defenseRating = 92;
-    yieldRating = 88;
-  }
-
-  // 根據風險係數與實際殖利率動態微調評分
-  if (stock.risk <= 32) defenseRating = Math.max(defenseRating, 94);
-  else if (stock.risk > 48) defenseRating = Math.min(defenseRating, 48);
-
-  if (stock.yield >= 4.5) yieldRating = Math.max(yieldRating, 92);
-  else if (stock.yield < 2.0) yieldRating = Math.min(yieldRating, 35);
-
-  // 動態評價分析評語
-  let peComment = "";
-  if (!stock.pe) {
-    peComment = "目前尚無本益比資料，暫不進行評價估算。建議參考同業水準。";
-  } else if (stock.pe < 15) {
-    peComment = `當前本益比僅為 <b>${stock.pe.toFixed(1)} 倍</b>，顯著低於歷史均值，安全邊際極高。在市場重新評價前，為絕佳的價值佈局點。`;
-  } else if (stock.pe >= 15 && stock.pe <= 25) {
-    peComment = `當前本益比為 <b>${stock.pe.toFixed(1)} 倍</b>，處於合理價值區間，反映市場對於公司穩健盈餘成長與產業地位的期待。`;
-  } else {
-    peComment = `當前本益比為 <b>${stock.pe.toFixed(1)} 倍</b>，溢價反映市場對其在 AI、先進製程等領域高速成長的強烈預期。操作需留意短期技術性震盪。`;
-  }
-
-  let yieldComment = "";
-  if (stock.yield >= 4.0) {
-    yieldComment = `當前殖利率高達 <b>${stock.yield.toFixed(1)}%</b>，提供極佳的防禦性支撐與強勁現金流，非常適合作為收益型存股配置。`;
-  } else if (stock.yield >= 2.5 && stock.yield < 4.0) {
-    yieldComment = `當前殖利率為 <b>${stock.yield.toFixed(1)}%</b>，配息表現屬中等穩健，兼顧公司擴大營運的資本保留與股東股利回饋。`;
-  } else {
-    yieldComment = `當前殖利率為 <b>${stock.yield.toFixed(1)}%</b>，並非主打高配息標的。公司盈餘多數保留以投入高研發及先進製程，適合追求長期資本增值的投資人。`;
-  }
-
-  const results = calculateStockStrategy(stock, amount, period);
-  const styleLabel = stock.style === "growth" ? "成長型" : stock.style === "value" ? "價值型" : "收益型";
-
-  return `
-    <div class="modal-stock-header">
-      <div class="modal-stock-title">
-        <h2 id="modalTitle">${stock.code} ${stock.name}</h2>
-        <span class="modal-stock-style-tag ${stock.style}">${styleLabel}</span>
-        <span class="risk-pill" style="--risk-color:${riskLabel(stock.risk).color}">${riskLabel(stock.risk).text} ${stock.risk}</span>
-      </div>
-      <div class="modal-stock-subtitle">
-        <span>產業分類：<b>${stock.sector}</b></span>
-        <span>推薦總分：<b>${stock.score} 分</b></span>
-      </div>
-    </div>
-
-    <div class="modal-grid">
-      <!-- 左欄：推薦原因與量規指標 -->
-      <div class="analysis-info-col">
-        <div class="indicators-panel">
-          <div class="indicator-row">
-            <span class="indicator-label">成長潛力</span>
-            <div class="indicator-progress-outer">
-              <div class="indicator-progress-inner" style="background:var(--teal); width:0%" data-val="${growthRating}"></div>
-            </div>
-            <span class="indicator-value">${growthRating}%</span>
-          </div>
-          <div class="indicator-row">
-            <span class="indicator-label">防禦屬性</span>
-            <div class="indicator-progress-outer">
-              <div class="indicator-progress-inner" style="background:var(--green); width:0%" data-val="${defenseRating}"></div>
-            </div>
-            <span class="indicator-value">${defenseRating}%</span>
-          </div>
-          <div class="indicator-row">
-            <span class="indicator-label">收益回報</span>
-            <div class="indicator-progress-outer">
-              <div class="indicator-progress-inner" style="background:var(--amber); width:0%" data-val="${yieldRating}"></div>
-            </div>
-            <span class="indicator-value">${yieldRating}%</span>
-          </div>
-          <div class="indicator-row">
-            <span class="indicator-label">市場動能</span>
-            <div class="indicator-progress-outer">
-              <div class="indicator-progress-inner" style="background:var(--red); width:0%" data-val="${momentumRating}"></div>
-            </div>
-            <span class="indicator-value">${momentumRating}%</span>
-          </div>
-        </div>
-
-        <div class="dynamic-analysis-box">
-          <div class="analysis-card" style="border-left: 4px solid ${stock.accent}">
-            <h4>
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-              </svg>
-              推薦核心原因
-            </h4>
-            <p>${stock.reason}</p>
-          </div>
-
-          <div class="analysis-card" style="border-left: 4px solid var(--teal)">
-            <h4>
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M4 11H2v3h2v-3zm5-4H7v7h2V7zm5-5v12h-2V2h2zm-2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1h-2zM6 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm-5 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3z"/>
-              </svg>
-              估值合理性分析
-            </h4>
-            <p>${peComment}</p>
-          </div>
-
-          <div class="analysis-card" style="border-left: 4px solid var(--amber)">
-            <h4>
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0-1a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"/>
-                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
-              </svg>
-              殖利率與現金流
-            </h4>
-            <p>${yieldComment}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 右欄：智慧策略計算器 -->
-      <div class="strategy-calc-col">
-        <div class="calc-box">
-          <h3 class="calc-title">智慧投資試算</h3>
-          <div class="calc-input-group">
-            <label class="calc-field">
-              <span>預計投資金額 (NTD)</span>
-              <div class="calc-input-wrapper">
-                <input id="investmentAmount" type="number" value="${amount}" min="1000" step="5000" />
-                <span class="calc-input-unit">元</span>
-              </div>
-            </label>
-            <label class="calc-field">
-              <span>選擇投資週期</span>
-              <select id="investmentPeriod">
-                <option value="long" ${period === "long" ? "selected" : ""}>長期存股佈局</option>
-                <option value="swing" ${period === "swing" ? "selected" : ""}>波段操作交易</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="calc-results">
-            <div class="calc-result-item">
-              <span>預估可買進股數</span>
-              <strong id="calcShares">${results.sharesText}</strong>
-            </div>
-            <div class="calc-result-item">
-              <span>估計年配息收益</span>
-              <strong id="calcDividend" class="highlight">${results.dividendText}</strong>
-            </div>
-            ${stock.price === 0 ? `
-              <div class="price-warning">
-                ⚠️ 目前顯示為系統初始價，建議點擊「立即更新」獲取 TWSE 即時股價，以利策略價位試算。
-              </div>
-            ` : ""}
-          </div>
-        </div>
-
-        <div class="strategy-suggest-panel">
-          <div class="target-levels-grid">
-            <div class="level-card buy">
-              <span>建議買點</span>
-              <strong>${results.buyLevel}</strong>
-            </div>
-            <div class="level-card profit">
-              <span>停利目標</span>
-              <strong>${results.profitLevel}</strong>
-            </div>
-            <div class="level-card stop">
-              <span>嚴格停損</span>
-              <strong>${results.stopLevel}</strong>
-            </div>
-          </div>
-
-          <div id="strategyAdvice" class="strategy-advice-text">
-            <h5>${results.strategyTitle}</h5>
-            <p>${results.strategyBody}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
 }
 
 bindEvents();
 render();
 refreshMarketData();
 window.setInterval(refreshMarketData, REFRESH_INTERVAL_MS);
-
