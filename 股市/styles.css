@@ -222,24 +222,45 @@ input[type="range"],
   height: 18px;
 }
 
-.refresh-button {
+.sidebar-action-panel {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.sidebar-action-panel .update-button {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   min-height: 44px;
+  margin: 0;
   border: 1px solid var(--ink);
   border-radius: 8px;
   background: var(--ink);
   color: #fff;
   cursor: pointer;
   font-weight: 800;
+  transform: none;
 }
 
-.refresh-button:disabled {
+.sidebar-action-panel .update-button:hover {
+  transform: none;
+}
+
+.sidebar-action-panel .update-button:disabled {
   opacity: 0.58;
   cursor: wait;
 }
 
-.disclaimer {
-  margin-top: 20px;
+.sidebar-action-panel .sidebar-note {
+  position: static;
+  display: block;
+  clear: both;
+  margin: 0;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.7;
@@ -692,7 +713,7 @@ canvas {
     height: auto;
   }
 
-  .disclaimer {
+  .sidebar-note {
     position: static;
     margin-top: 24px;
   }

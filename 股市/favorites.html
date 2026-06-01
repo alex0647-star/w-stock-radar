@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>我的最愛股票觀察</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260601-3" />
   </head>
   <body data-page="favorites">
     <div class="app-shell favorites-shell">
@@ -22,7 +22,12 @@
           <a class="active" href="favorites.html">我的最愛</a>
         </nav>
 
-        <button id="refreshButton" class="refresh-button" type="button">立即更新</button>
+        <div class="sidebar-action-panel">
+          <button id="refreshButton" class="update-button" type="button">立即更新</button>
+          <p class="sidebar-note">
+            最愛清單會保存在目前瀏覽器。若更換裝置或清除瀏覽器資料，收藏清單需要重新加入。
+          </p>
+        </div>
 
         <div class="favorite-summary">
           <div>
@@ -47,9 +52,6 @@
           </div>
         </div>
 
-        <p class="disclaimer">
-          最愛清單會保存在目前瀏覽器。若更換裝置或清除瀏覽器資料，收藏清單需要重新加入。
-        </p>
       </aside>
 
       <main class="workspace">
