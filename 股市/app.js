@@ -217,7 +217,10 @@ function renderStockCard(stock) {
 
       <div class="card-actions">
         <span class="risk-pill" style="--risk-color:${risk.color}">${risk.text} ${stock.risk}</span>
-        <button class="watch-btn ${added ? "added" : ""}" data-code="${stock.code}" type="button">${buttonText}</button>
+        <div class="card-buttons">
+          <button class="analyze-btn" data-analyze="${stock.code}" type="button">分析策略</button>
+          <button class="watch-btn ${added ? "added" : ""}" data-code="${stock.code}" type="button">${buttonText}</button>
+        </div>
       </div>
     </article>
   `;
@@ -471,6 +474,9 @@ function bindEvents() {
   document.addEventListener("click", (event) => {
     const watchButton = event.target.closest("[data-code]");
     const removeButton = event.target.closest("[data-remove]");
+    const analyzeButton = event.target.closest("[data-analyze]");
+    const closeBtn = event.target.closest("#closeModalBtn");
+    const overlay = event.target;
 
     if (watchButton) {
       const code = watchButton.dataset.code;
@@ -485,12 +491,375 @@ function bindEvents() {
       saveWatchList();
       render();
     }
+
+    if (analyzeButton) {
+      openAnalysisModal(analyzeButton.dataset.analyze);
+    }
+
+    if (closeBtn || (overlay && overlay.id === "analysisModal")) {
+      closeAnalysisModal();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeAnalysisModal();
+    }
   });
 
   window.addEventListener("resize", render);
+}
+
+/* ==========================================================================
+   個股策略與分析邏輯 (Modal & Strategy Analysis Implementation)
+   ========================================================================== */
+
+let currentAnalysisStock = null;
+
+function openAnalysisModal(stockCode) {
+  const stock = stocks.find((s) => s.code === stockCode);
+  if (!stock) return;
+
+  currentAnalysisStock = stock;
+  const modal = document.querySelector("#analysisModal");
+  const modalBody = document.querySelector("#modalBody");
+
+  if (!modal || !modalBody) return;
+
+  // 初始試算參數設定
+  const defaultAmount = 100000;
+  const defaultPeriod = "long";
+
+  // 渲染初始版面樣式
+  modalBody.innerHTML = generateAnalysisHtml(stock, defaultAmount, defaultPeriod);
+
+  // 延遲載入進度條動畫以利瀏覽器渲染過渡
+  setTimeout(() => {
+    const bars = modalBody.querySelectorAll(".indicator-progress-inner");
+    bars.forEach((bar) => {
+      const val = bar.dataset.val;
+      bar.style.width = `${val}%`;
+    });
+  }, 40);
+
+  // 開啟視窗
+  modal.classList.add("active");
+  modal.setAttribute("aria-hidden", "false");
+
+  // 綁定智慧試算事件
+  const amountInput = modalBody.querySelector("#investmentAmount");
+  const periodSelect = modalBody.querySelector("#investmentPeriod");
+
+  const updateCalc = () => {
+    const amount = toNumber(amountInput.value) || 0;
+    const period = periodSelect.value;
+    const results = calculateStockStrategy(stock, amount, period);
+
+    const sharesEl = modalBody.querySelector("#calcShares");
+    const dividendEl = modalBody.querySelector("#calcDividend");
+    const strategyEl = modalBody.querySelector("#strategyAdvice");
+
+    if (sharesEl) sharesEl.innerHTML = results.sharesText;
+    if (dividendEl) dividendEl.textContent = results.dividendText;
+    if (strategyEl) {
+      strategyEl.querySelector("h5").textContent = results.strategyTitle;
+      strategyEl.querySelector("p").textContent = results.strategyBody;
+    }
+  };
+
+  amountInput?.addEventListener("input", updateCalc);
+  periodSelect?.addEventListener("change", updateCalc);
+}
+
+function closeAnalysisModal() {
+  const modal = document.querySelector("#analysisModal");
+  if (!modal) return;
+  modal.classList.remove("active");
+  modal.setAttribute("aria-hidden", "true");
+  currentAnalysisStock = null;
+}
+
+function calculateStockStrategy(stock, amount, period) {
+  const price = stock.price || 0;
+  const yieldVal = stock.yield || 0;
+
+  // 1. 預估可買進股數計算
+  let sharesText = "--";
+  if (price > 0) {
+    const shares = Math.floor(amount / price);
+    if (shares >= 1000) {
+      const lots = Math.floor(shares / 1000);
+      const remain = shares % 1000;
+      sharesText = `<span class="highlight">${shares.toLocaleString("zh-TW")}</span> 股 <small>(${lots} 張${remain ? ` + ${remain} 股` : ""})</small>`;
+    } else if (shares > 0) {
+      sharesText = `<span class="highlight">${shares}</span> 股 <small>(零股交易)</small>`;
+    } else {
+      sharesText = `<span class="highlight">0</span> 股 <small>(資金不足買 1 股)</small>`;
+    }
+  } else {
+    sharesText = `<span style="color:var(--red)">請立即更新報價</span>`;
+  }
+
+  // 2. 年估計股利回報
+  const estDividend = Math.round(amount * (yieldVal / 100));
+  const dividendText = price > 0 ? `NT$ ${estDividend.toLocaleString("zh-TW")} 元 / 年` : "--";
+
+  // 3. 建議買點、停利目標與停損價位
+  let buyLevel = "--";
+  let profitLevel = "--";
+  let stopLevel = "--";
+
+  if (price > 0) {
+    if (stock.style === "growth") {
+      buyLevel = formatPrice(price * 0.96);
+      profitLevel = formatPrice(price * 1.15);
+      stopLevel = formatPrice(price * 0.91);
+    } else if (stock.style === "value") {
+      buyLevel = formatPrice(price * 0.95);
+      profitLevel = formatPrice(price * 1.18);
+      stopLevel = formatPrice(price * 0.90);
+    } else { // income
+      buyLevel = formatPrice(price * 0.98);
+      profitLevel = formatPrice(price * 1.08);
+      stopLevel = formatPrice(price * 0.95);
+    }
+  }
+
+  // 4. 客製化交易策略內容
+  let strategyTitle = "";
+  let strategyBody = "";
+
+  if (period === "swing") {
+    strategyTitle = "📊 波段操作建議策略";
+    if (stock.style === "growth") {
+      strategyBody = `建議設定 10 日均線（約 ${buyLevel} 元）附近為分批波段切入點。若股價跌破月線或支撐關卡（約 ${stopLevel} 元）則應嚴格停損。第一階段停利目標設為 ${profitLevel} 元，預估有 15% 上檔空間。`;
+    } else if (stock.style === "value") {
+      strategyBody = `本益比偏低具備高度安全邊際。適合在股價回檔至區間下緣（約 ${buyLevel} 元）分批承接。一旦轉型或伺服器題材發酵帶動評價修復、股價向停利點 ${profitLevel} 元靠攏時即可分批獲利了結。`;
+    } else {
+      strategyBody = `收益型標的波動度極低，短線波段空間偏窄。若逢盤勢修正使股價跌至 ${buyLevel} 元可酌量介入，反彈至停利目標 ${profitLevel} 元即可獲利入袋，操作不宜過度追價。`;
+    }
+  } else {
+    strategyTitle = "📈 長期投資配置策略";
+    if (stock.style === "growth") {
+      strategyBody = `長線高成長領先股，極適合以『定期定額』建立基本部位。若遇大盤系統性修正導致股價跌幅達 10-15%（跌破 ${stopLevel} 元）時，建議採單筆額外加碼。策略以中長線持有為主，充分享受行業長期增值的複利效應。`;
+    } else if (stock.style === "value") {
+      strategyBody = `適合在中長線景氣循環底部或轉型期逢低分批布局。建議設定 1 年以上的持有耐心，在股價低於 ${buyLevel} 元時逐步累積部位，靜待營運體質优化與盈餘重新評價的到來。`;
+    } else {
+      strategyBody = `核心存股標的。建議採取『逢黑 K 買進』策略以降低平均持有成本。當股價低於 ${buyLevel} 元時是極佳的加碼扣款點，並建議將每年領取的現金股利持續『複利再投資』，發揮長線滾雪球的最大綜效。`;
+    }
+  }
+
+  return {
+    sharesText,
+    dividendText,
+    buyLevel,
+    profitLevel,
+    stopLevel,
+    strategyTitle,
+    strategyBody
+  };
+}
+
+function generateAnalysisHtml(stock, amount, period) {
+  // 根據投資類型計算指標雷達圖佔比 (成長潛力、防禦屬性、收益回報、市場動能)
+  let growthRating = 50;
+  let defenseRating = 50;
+  let yieldRating = 50;
+  let momentumRating = Math.round(stock.momentum);
+
+  if (stock.style === "growth") {
+    growthRating = 94;
+    defenseRating = 55;
+    yieldRating = 42;
+  } else if (stock.style === "value") {
+    growthRating = 74;
+    defenseRating = 72;
+    yieldRating = 60;
+  } else if (stock.style === "income") {
+    growthRating = 40;
+    defenseRating = 92;
+    yieldRating = 88;
+  }
+
+  // 根據風險係數與實際殖利率動態微調評分
+  if (stock.risk <= 32) defenseRating = Math.max(defenseRating, 94);
+  else if (stock.risk > 48) defenseRating = Math.min(defenseRating, 48);
+
+  if (stock.yield >= 4.5) yieldRating = Math.max(yieldRating, 92);
+  else if (stock.yield < 2.0) yieldRating = Math.min(yieldRating, 35);
+
+  // 動態評價分析評語
+  let peComment = "";
+  if (!stock.pe) {
+    peComment = "目前尚無本益比資料，暫不進行評價估算。建議參考同業水準。";
+  } else if (stock.pe < 15) {
+    peComment = `當前本益比僅為 <b>${stock.pe.toFixed(1)} 倍</b>，顯著低於歷史均值，安全邊際極高。在市場重新評價前，為絕佳的價值佈局點。`;
+  } else if (stock.pe >= 15 && stock.pe <= 25) {
+    peComment = `當前本益比為 <b>${stock.pe.toFixed(1)} 倍</b>，處於合理價值區間，反映市場對於公司穩健盈餘成長與產業地位的期待。`;
+  } else {
+    peComment = `當前本益比為 <b>${stock.pe.toFixed(1)} 倍</b>，溢價反映市場對其在 AI、先進製程等領域高速成長的強烈預期。操作需留意短期技術性震盪。`;
+  }
+
+  let yieldComment = "";
+  if (stock.yield >= 4.0) {
+    yieldComment = `當前殖利率高達 <b>${stock.yield.toFixed(1)}%</b>，提供極佳的防禦性支撐與強勁現金流，非常適合作為收益型存股配置。`;
+  } else if (stock.yield >= 2.5 && stock.yield < 4.0) {
+    yieldComment = `當前殖利率為 <b>${stock.yield.toFixed(1)}%</b>，配息表現屬中等穩健，兼顧公司擴大營運的資本保留與股東股利回饋。`;
+  } else {
+    yieldComment = `當前殖利率為 <b>${stock.yield.toFixed(1)}%</b>，並非主打高配息標的。公司盈餘多數保留以投入高研發及先進製程，適合追求長期資本增值的投資人。`;
+  }
+
+  const results = calculateStockStrategy(stock, amount, period);
+  const styleLabel = stock.style === "growth" ? "成長型" : stock.style === "value" ? "價值型" : "收益型";
+
+  return `
+    <div class="modal-stock-header">
+      <div class="modal-stock-title">
+        <h2 id="modalTitle">${stock.code} ${stock.name}</h2>
+        <span class="modal-stock-style-tag ${stock.style}">${styleLabel}</span>
+        <span class="risk-pill" style="--risk-color:${riskLabel(stock.risk).color}">${riskLabel(stock.risk).text} ${stock.risk}</span>
+      </div>
+      <div class="modal-stock-subtitle">
+        <span>產業分類：<b>${stock.sector}</b></span>
+        <span>推薦總分：<b>${stock.score} 分</b></span>
+      </div>
+    </div>
+
+    <div class="modal-grid">
+      <!-- 左欄：推薦原因與量規指標 -->
+      <div class="analysis-info-col">
+        <div class="indicators-panel">
+          <div class="indicator-row">
+            <span class="indicator-label">成長潛力</span>
+            <div class="indicator-progress-outer">
+              <div class="indicator-progress-inner" style="background:var(--teal); width:0%" data-val="${growthRating}"></div>
+            </div>
+            <span class="indicator-value">${growthRating}%</span>
+          </div>
+          <div class="indicator-row">
+            <span class="indicator-label">防禦屬性</span>
+            <div class="indicator-progress-outer">
+              <div class="indicator-progress-inner" style="background:var(--green); width:0%" data-val="${defenseRating}"></div>
+            </div>
+            <span class="indicator-value">${defenseRating}%</span>
+          </div>
+          <div class="indicator-row">
+            <span class="indicator-label">收益回報</span>
+            <div class="indicator-progress-outer">
+              <div class="indicator-progress-inner" style="background:var(--amber); width:0%" data-val="${yieldRating}"></div>
+            </div>
+            <span class="indicator-value">${yieldRating}%</span>
+          </div>
+          <div class="indicator-row">
+            <span class="indicator-label">市場動能</span>
+            <div class="indicator-progress-outer">
+              <div class="indicator-progress-inner" style="background:var(--red); width:0%" data-val="${momentumRating}"></div>
+            </div>
+            <span class="indicator-value">${momentumRating}%</span>
+          </div>
+        </div>
+
+        <div class="dynamic-analysis-box">
+          <div class="analysis-card" style="border-left: 4px solid ${stock.accent}">
+            <h4>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+              </svg>
+              推薦核心原因
+            </h4>
+            <p>${stock.reason}</p>
+          </div>
+
+          <div class="analysis-card" style="border-left: 4px solid var(--teal)">
+            <h4>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 11H2v3h2v-3zm5-4H7v7h2V7zm5-5v12h-2V2h2zm-2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1h-2zM6 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm-5 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3z"/>
+              </svg>
+              估值合理性分析
+            </h4>
+            <p>${peComment}</p>
+          </div>
+
+          <div class="analysis-card" style="border-left: 4px solid var(--amber)">
+            <h4>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0-1a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"/>
+                <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+              </svg>
+              殖利率與現金流
+            </h4>
+            <p>${yieldComment}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右欄：智慧策略計算器 -->
+      <div class="strategy-calc-col">
+        <div class="calc-box">
+          <h3 class="calc-title">智慧投資試算</h3>
+          <div class="calc-input-group">
+            <label class="calc-field">
+              <span>預計投資金額 (NTD)</span>
+              <div class="calc-input-wrapper">
+                <input id="investmentAmount" type="number" value="${amount}" min="1000" step="5000" />
+                <span class="calc-input-unit">元</span>
+              </div>
+            </label>
+            <label class="calc-field">
+              <span>選擇投資週期</span>
+              <select id="investmentPeriod">
+                <option value="long" ${period === "long" ? "selected" : ""}>長期存股佈局</option>
+                <option value="swing" ${period === "swing" ? "selected" : ""}>波段操作交易</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="calc-results">
+            <div class="calc-result-item">
+              <span>預估可買進股數</span>
+              <strong id="calcShares">${results.sharesText}</strong>
+            </div>
+            <div class="calc-result-item">
+              <span>估計年配息收益</span>
+              <strong id="calcDividend" class="highlight">${results.dividendText}</strong>
+            </div>
+            ${stock.price === 0 ? `
+              <div class="price-warning">
+                ⚠️ 目前顯示為系統初始價，建議點擊「立即更新」獲取 TWSE 即時股價，以利策略價位試算。
+              </div>
+            ` : ""}
+          </div>
+        </div>
+
+        <div class="strategy-suggest-panel">
+          <div class="target-levels-grid">
+            <div class="level-card buy">
+              <span>建議買點</span>
+              <strong>${results.buyLevel}</strong>
+            </div>
+            <div class="level-card profit">
+              <span>停利目標</span>
+              <strong>${results.profitLevel}</strong>
+            </div>
+            <div class="level-card stop">
+              <span>嚴格停損</span>
+              <strong>${results.stopLevel}</strong>
+            </div>
+          </div>
+
+          <div id="strategyAdvice" class="strategy-advice-text">
+            <h5>${results.strategyTitle}</h5>
+            <p>${results.strategyBody}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 bindEvents();
 render();
 refreshMarketData();
 window.setInterval(refreshMarketData, REFRESH_INTERVAL_MS);
+

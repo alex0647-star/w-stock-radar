@@ -737,3 +737,413 @@ canvas {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ==========================================================================
+   個股策略與分析中心 (Modal & Strategy Analysis Center)
+   ========================================================================== */
+
+.card-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.analyze-btn {
+  min-height: 38px;
+  border: 1px solid var(--teal);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--teal);
+  padding: 0 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 700;
+  transition: all 0.16s ease;
+}
+
+.analyze-btn:hover {
+  background: var(--teal);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.2);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(24, 32, 38, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 860px;
+  max-height: 90vh;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 253, 250, 0.96);
+  box-shadow: 0 24px 60px rgba(24, 32, 38, 0.25);
+  padding: 32px;
+  overflow-y: auto;
+  transform: scale(0.92) translateY(20px);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1) translateY(0);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  transition: all 0.16s ease;
+}
+
+.modal-close-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+  transform: rotate(90deg);
+}
+
+/* Modal Body Layout */
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 28px;
+  margin-top: 12px;
+}
+
+/* Left Column */
+.analysis-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-stock-header {
+  border-bottom: 2px solid var(--line);
+  padding-bottom: 14px;
+}
+
+.modal-stock-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.modal-stock-title h2 {
+  font-size: 26px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.modal-stock-style-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.modal-stock-style-tag.growth { background: var(--soft-green); color: var(--green); }
+.modal-stock-style-tag.income { background: var(--soft-amber); color: #7a4a08; }
+.modal-stock-style-tag.value { background: rgba(37, 99, 235, 0.1); color: var(--blue); }
+
+.modal-stock-subtitle {
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Attributes Progress Bars */
+.indicators-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(246, 244, 238, 0.6);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.indicator-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.indicator-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.indicator-progress-outer {
+  height: 8px;
+  background: rgba(222, 216, 204, 0.5);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.indicator-progress-inner {
+  height: 100%;
+  border-radius: inherit;
+  width: 0%;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.indicator-value {
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+  color: var(--ink);
+}
+
+/* Dynamic Analysis Section */
+.dynamic-analysis-box {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.analysis-card {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(38, 32, 24, 0.03);
+}
+
+.analysis-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+}
+
+.analysis-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Right Column */
+.strategy-calc-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-left: 1px solid var(--line);
+  padding-left: 28px;
+}
+
+.calc-box {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(38, 32, 24, 0.04);
+}
+
+.calc-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+
+.calc-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calc-field span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.calc-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.calc-input-wrapper input {
+  padding-right: 48px;
+}
+
+.calc-input-unit {
+  position: absolute;
+  right: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* Calculator Results */
+.calc-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+}
+
+.calc-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calc-result-item span {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.calc-result-item strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.calc-result-item strong.highlight {
+  color: var(--teal);
+}
+
+/* Strategy Suggestion Panel */
+.strategy-suggest-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.target-levels-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.level-card {
+  padding: 10px 6px;
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.level-card.buy { background: rgba(8, 145, 178, 0.08); border: 1px solid rgba(8, 145, 178, 0.2); }
+.level-card.profit { background: rgba(194, 65, 61, 0.08); border: 1px solid rgba(194, 65, 61, 0.2); }
+.level-card.stop { background: rgba(22, 131, 95, 0.08); border: 1px solid rgba(22, 131, 95, 0.2); }
+
+.level-card span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.level-card strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.level-card.buy strong { color: var(--teal); }
+.level-card.profit strong { color: var(--red); }
+.level-card.stop strong { color: var(--green); }
+
+.strategy-advice-text {
+  padding: 14px;
+  background: var(--soft-amber);
+  border-left: 4px solid var(--amber);
+  border-radius: 0 8px 8px 0;
+}
+
+.strategy-advice-text h5 {
+  margin: 0 0 6px 0;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #7a4a08;
+}
+
+.strategy-advice-text p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #5c3b0d;
+}
+
+.price-warning {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: var(--red);
+  font-weight: 700;
+  text-align: center;
+  background: rgba(194, 65, 61, 0.05);
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+@media (max-width: 820px) {
+  .modal-content {
+    padding: 24px 18px;
+    width: 95%;
+  }
+  .modal-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .strategy-calc-col {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+}
+
