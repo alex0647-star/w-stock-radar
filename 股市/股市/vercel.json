@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "api/twse.js": {
+      "maxDuration": 10
+    },
+    "api/stock/[code]/realtime.js": {
+      "maxDuration": 10
+    },
+    "api/stock/[code]/kline.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/stock/:code",
+      "destination": "/stock.html"
+    }
+  ]
+}
